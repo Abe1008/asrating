@@ -37,7 +37,7 @@ public class R {
 
     static String   dbHost = _r.dbHost ;// сервер MySql
     static String   dbBase = _r.dbBase ;// база данных MySql
-    static String   dbUser = _r.dbUser ;// пользоватекль MySql
+    static String   dbUser = _r.dbUser ;// пользователь MySql
     static String   dbPass = _r.dbPass ;// пароль MySql
 
     /**

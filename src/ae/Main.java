@@ -55,6 +55,7 @@ public class Main {
                 "WHERE Rating.dat='" + strDat1 + "' " +
                 "GROUP BY pn;";
         ArrayList<String[]> arrlst = db.DlookupArray(sql);
+
         if(arrlst == null) {
             System.err.println("?-Error-MySql database error");
             System.exit(2);
@@ -62,21 +63,13 @@ public class Main {
 
         System.out.println("Rating for "+ sdat);
 
-        if(arrlst.size() < 1) {
+        if(arrlst.size() > 0) {
+            String outFile = fxls.makeList(arrlst, ".");
+            System.out.println("output: " + outFile);
+        } else {
             System.err.println("No rating");
-            return;
         }
 
-        String outFile = fxls.makeList(arrlst, ".");
-
-        System.out.println("output: " + outFile);
-        //
-//        MailSend mc = new MailSend();
-//        String  otv;
-//        otv = mc.mailSend(R.SmtpMailTo,R.MailSubject + " " + sdat, R.MailMessage, outFile);
-//        if(otv != null) {
-//            System.out.println("Почта отправлена: " + R.SmtpMailTo);
-//        }
     }
 
     /**
