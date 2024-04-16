@@ -23,11 +23,12 @@ import java.util.Properties;
  * 31.05.23  изменил формат вывода в Excel добавил название региона, а номер региона придвинул к ИНН
  * 01.06.23  номера колонок задать в properties
  * 15.04.24  только записываем Excel
+ * 16.04.24  может подключаться к Sqlite (копии данных из Mysql - gmirdata.db)
  *
  */
 
 public class R {
-    private final static String Ver = "Ver. 2.1"; // номер версии
+    final static String Ver = "Ver. 3.1"; // номер версии
     
     final static String sep = System.getProperty("file.separator"); // разделитель имени каталогов
 

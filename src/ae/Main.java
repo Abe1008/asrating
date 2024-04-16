@@ -17,6 +17,31 @@ public class Main {
     public static void main(String[] args) {
 	      // write your code here
         System.out.println("Данные рейтинга");
+        String sqliteDb = null;
+        try {
+            for (int i = 0; i < args.length; i++) {
+                switch (args[i]) {
+                    case "-db":
+                        sqliteDb = args[++i];    // имя файла Sqlite, вместо MySql
+                        break;
+
+                    case "-?":
+                        System.out.println(helpmsg);
+                        System.exit(1);
+                        break;
+
+                    default:
+                        // задан файл рабочей базы данных
+                        System.err.println("?-Error-неправильный формат командной строки");
+                        System.exit(2);
+                        break;
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("?-Error-" + e.getMessage());
+            System.exit(2);
+            return;
+        }
 
         if(!prepareWork()) {
             System.out.println("Error prepare work");
@@ -30,7 +55,14 @@ public class Main {
         String sdat = String.format("%02d.%02d.%04d",d,m,y);
         //
         // откроем БД
-        Database db = new DatabaseMysql(R.dbHost,R.dbBase,R.dbUser,R.dbPass);
+        Database db;
+        if(sqliteDb == null) {
+            System.out.println("Connect MySql");
+            db = new DatabaseMysql(R.dbHost, R.dbBase, R.dbUser, R.dbPass);
+        } else {
+            System.out.println("Connect Sqlite");
+            db = new DatabaseSqlite(sqliteDb);
+        }
         //
         // создадим объект для формирования отчета Excel
         String   oidx = "1i | 2 | 3 | 4i | 5 | 6f | 7i | 8i | 9";    // список колонок в Excel
@@ -47,7 +79,8 @@ public class Main {
                 "CONCAT(ROUND(100*not_block/total,3),''), " +   // процент (не ставим знак %)
                 "total, " +                                     // всего в реестре
                 "not_block, " +                                 // не заблокировано
-                "GROUP_CONCAT(note SEPARATOR ' | ') " +         // вышестоящие
+                // /// "GROUP_CONCAT(note SEPARATOR ' | ') " +         // вышестоящие
+                "GROUP_CONCAT(note,'  ') " +         // вышестоящие
                 "FROM Rating LEFT JOIN " +
                 "(Opers LEFT JOIN opnotes ON (Opers.op_id=opnotes.op_id AND opnotes.tip='Uplink')) " +
                 "ON Rating.inn = Opers.op_inn " +
@@ -57,8 +90,8 @@ public class Main {
         ArrayList<String[]> arrlst = db.DlookupArray(sql);
 
         if(arrlst == null) {
-            System.err.println("?-Error-MySql database error");
-            System.exit(2);
+            System.err.println("?-Error-database error");
+            System.exit(3);
         }
 
         System.out.println("Rating for "+ sdat);
@@ -97,4 +130,9 @@ public class Main {
         return true;
     }
 
-}
+    static String helpmsg = "Формирование таблицы рейтинга. ver." + R.Ver + "\n" +
+            "java -jar asrating.jar [-db sqlite.db]\n" +
+            "  sqlite.db - БД Sqlite с копией данных из MySql\n" +
+            "Если параметры не указаны, подключается к MySql.";
+
+} // END OF CLASS
